@@ -42,7 +42,82 @@ document.addEventListener('DOMContentLoaded', function() {
     initUnitConverter();
     initBMICalculator();
     initJSONFormatter();
+    initThemeToggle(); // Initialize theme toggle
+    registerServiceWorker(); // Register Service Worker
 });
+
+// Service Worker Registration
+function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('Service Worker registered successfully:', registration);
+                })
+                .catch(error => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        });
+    } else {
+        console.log('Service Worker not supported in this browser.');
+    }
+}
+
+// Theme Toggle Functionality
+function initThemeToggle() {
+    const themeToggle = document.getElementById('theme-toggle-checkbox');
+    const body = document.body;
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        } else {
+            body.classList.remove('dark-mode');
+            themeToggle.checked = false;
+        }
+    }
+
+    // Check local storage first
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else if (prefersDarkScheme.matches) { // Then check system preference
+        applyTheme('dark');
+        localStorage.setItem('theme', 'dark'); // Save system preference if no local storage
+    } else {
+        applyTheme('light'); // Default to light
+    }
+
+    themeToggle.addEventListener('change', function() {
+        if (this.checked) {
+            applyTheme('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            applyTheme('light');
+            localStorage.setItem('theme', 'light');
+        }
+    });
+
+    // Listen for changes in system preference
+    prefersDarkScheme.addEventListener('change', (e) => {
+        const currentLocalStorageTheme = localStorage.getItem('theme');
+        // Only update if user hasn't manually overridden system preference via toggle
+        if (!currentLocalStorageTheme ||
+            (currentLocalStorageTheme === 'dark' && !e.matches) ||
+            (currentLocalStorageTheme === 'light' && e.matches)) {
+            if (e.matches) {
+                applyTheme('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                applyTheme('light');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+    });
+}
+
 
 // 1. Text to Speech Tool
 function initTextToSpeech() {
@@ -696,26 +771,47 @@ function initJSONFormatter() {
 }
 
 // Scroll animations
-function animateOnScroll() {
-    const sections = document.querySelectorAll('.tool-section');
-    
-    const observer = new IntersectionObserver((entries) => {
+function generalAnimateOnScroll() {
+    // Select all elements intended for scroll animation
+    const elementsToAnimate = document.querySelectorAll('.tool-section, .stat-card, .tool-header h2, .tool-header p, .btn, .palette-color, .bmi-range, .input-group, .control-group, .hero-content h1, .hero-content p');
+    // More specific selectors can be used, or a common class like '.scroll-animate'
+
+    const observer = new IntersectionObserver((entries, observerInstance) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.animationDelay = '0s';
-                entry.target.style.animationPlayState = 'running';
+                // Add 'is-visible' for CSS driven animation
+                entry.target.classList.add('is-visible');
+
+                // For elements that used the old direct style manipulation for slideInUp:
+                // Ensure they don't conflict or double-animate.
+                // The new .animate-on-scroll and .is-visible should handle this.
+                // If they still have inline styles from old animation, clear them or ensure CSS takes precedence.
+                if (entry.target.classList.contains('tool-section')) {
+                     // Clear old animation styles if they were directly set and might conflict
+                    entry.target.style.animationDelay = '';
+                    entry.target.style.animationPlayState = '';
+                    // The .tool-section already has slideInUp, we'll add animate-on-scroll to it.
+                }
+                 // No need to unobserve if animation is one-shot CSS transition/animation
+                // observerInstance.unobserve(entry.target); // Optional: unobserve after animation
             }
+            // Optional: remove 'is-visible' when element scrolls out of view for re-animation
+            // else {
+            //     entry.target.classList.remove('is-visible');
+            // }
         });
     }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        threshold: 0.1, // Adjust threshold as needed (percentage of element visible)
+        rootMargin: '0px 0px -30px 0px' // Start animation a bit before it's fully in view
     });
-    
-    sections.forEach(section => {
-        observer.observe(section);
+
+    elementsToAnimate.forEach(el => {
+        // Add the base class for animation that CSS targets
+        el.classList.add('animate-on-scroll');
+        observer.observe(el);
     });
 }
 
 // Initialize scroll animations
-document.addEventListener('DOMContentLoaded', animateOnScroll);
+document.addEventListener('DOMContentLoaded', generalAnimateOnScroll);
 
