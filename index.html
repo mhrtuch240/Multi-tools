@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi Tools Website</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4A90E2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MultiTools">
+    <meta name="msapplication-TileImage" content="/icons/icon-192x192.png"> <!-- Update path if needed -->
+    <meta name="msapplication-TileColor" content="#4A90E2">
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png"> <!-- Update path if needed -->
+
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -16,7 +28,7 @@
                 <i class="fas fa-tools"></i>
                 <span>Multi Tools</span>
             </div>
-            <ul class="nav-menu">
+            <ul class="nav-menu" id="nav-menu-list">
                 <li><a href="#text-to-speech" class="nav-link">Text to Speech</a></li>
                 <li><a href="#qr-generator" class="nav-link">QR Generator</a></li>
                 <li><a href="#password-generator" class="nav-link">Password Gen</a></li>
@@ -26,7 +38,13 @@
                 <li><a href="#bmi-calculator" class="nav-link">BMI Calculator</a></li>
                 <li><a href="#json-formatter" class="nav-link">JSON Formatter</a></li>
             </ul>
-            <div class="hamburger">
+            <div class="nav-controls">
+                <label class="theme-switch">
+                    <input type="checkbox" id="theme-toggle-checkbox" aria-label="Toggle theme between light and dark mode">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="hamburger" role="button" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-menu-list">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -234,21 +252,21 @@
                     <div class="color-value-group">
                         <label>HEX:</label>
                         <input type="text" id="hex-value" readonly>
-                        <button class="copy-btn" data-target="hex-value">
+                        <button class="copy-btn" data-target="hex-value" aria-label="Copy HEX color value to clipboard">
                             <i class="fas fa-copy"></i>
                         </button>
                     </div>
                     <div class="color-value-group">
                         <label>RGB:</label>
                         <input type="text" id="rgb-value" readonly>
-                        <button class="copy-btn" data-target="rgb-value">
+                        <button class="copy-btn" data-target="rgb-value" aria-label="Copy RGB color value to clipboard">
                             <i class="fas fa-copy"></i>
                         </button>
                     </div>
                     <div class="color-value-group">
                         <label>HSL:</label>
                         <input type="text" id="hsl-value" readonly>
-                        <button class="copy-btn" data-target="hsl-value">
+                        <button class="copy-btn" data-target="hsl-value" aria-label="Copy HSL color value to clipboard">
                             <i class="fas fa-copy"></i>
                         </button>
                     </div>
@@ -479,7 +497,7 @@
                             <button id="validate-json-btn" class="btn btn-info">
                                 <i class="fas fa-check"></i> Validate
                             </button>
-                            <button id="clear-json-btn" class="btn btn-danger">
+                            <button id="clear-json-btn" class="btn btn-danger" aria-label="Clear JSON input and output fields">
                                 <i class="fas fa-trash"></i> Clear
                             </button>
                         </div>
@@ -488,7 +506,7 @@
                         <label for="json-output">Formatted JSON:</label>
                         <textarea id="json-output" readonly rows="10"></textarea>
                         <div class="button-group">
-                            <button id="copy-json-btn" class="btn btn-secondary">
+                            <button id="copy-json-btn" class="btn btn-secondary" aria-label="Copy formatted JSON result to clipboard">
                                 <i class="fas fa-copy"></i> Copy Result
                             </button>
                         </div>
@@ -509,4 +527,6 @@
     <script src="script.js"></script>
 </body>
 </html>
+<!-- Added ARIA labels for theme toggle, copy buttons, and clear/copy JSON buttons. -->
+<!-- Added role and ARIA attributes to hamburger for better semantics. -->
 
